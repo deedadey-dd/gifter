@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+<!--                <div class="card">-->
+
+                        <h2 class="mt-5 text-center">Register</h2>
+    <!--                    <form method="POST" enctype="multipart/form-data">-->
+    <!--                        {% csrf_token %}-->
+    <!--                        {{ form.as_p }}-->
+    <!--                        <button type="submit" class="btn btn-primary">Register</button>-->
+    <!--                    </form>-->
+                            {% load widget_tweaks %}
+                            <form id="registerForm" method="post">
+                              {% csrf_token %}
+                              {{ form.non_field_errors }}
+
+                              {% for field in form %}
+                                <div class="form-group">
+                                  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    {{ field.errors }}
+                                    {{ field|add_class:"form-control" }}
+                                    <small class="form-text text-muted">{{ field.help_text }}</small>
+
+                                </div>
+                              {% endfor %}
+
+                              <button type="submit" class="btn btn-primary btn-block">Register</button>
+                            </form>
+
+<!--                </div>-->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

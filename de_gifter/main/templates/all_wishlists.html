@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}All Wishlists{% endblock %}
+
+{% block content %}
+<h2 class="mt-5">All Wishlists</h2>
+
+<div class="row">
+    {% for wishlist in wishlists %}
+    <div class="col-md-4 mb-4">
+        <div class="card" style="background-color: #{{ wishlist.color }};">
+            <div class="card-body">
+                <h5 class="card-title title-highlight">{{ wishlist.title }}</h5>
+
+                <i class="card-text">Created by: <b>{{ wishlist.user.name }}</b></i>
+                <div>
+                    {% if wishlist.user.profile_picture %}
+                        <img src="{{ wishlist.user.profile_picture.url }}" alt="Profile Picture" class="rounded-square" width="50" height="50">
+                    {% endif %}
+                </div>
+
+                <p class="card-text">{{ wishlist.description }}</p>
+                <p class="card-text"><strong>{{ wishlist.item_count }}</strong> item(s) with total cost of <strong>GH₵ {{ wishlist.total_cost|floatformat:2 }}</strong></p>
+
+                <p class="card-text">Ends In: <strong>{{ wishlist.days_left }}</strong> day(s)</p>
+                <a href="{% url 'view_wishlist' wishlist.id %}" class="btn btn-primary mt-3">View Wishlist</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="{% url 'all_wishlists' page=page_obj.previous_page_number %}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+                <span class="sr-only">Previous</span>
+            </a>
+        </li>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+            <a class="page-link" href="{% url 'all_wishlists' page=num %}">{{ num }}</a>
+        </li>
+        {% endfor %}
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="{% url 'all_wishlists' page=page_obj.next_page_number %}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+                <span class="sr-only">Next</span>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endblock %}

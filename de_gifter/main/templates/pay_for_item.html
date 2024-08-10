@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Contribute to Wishlist</h2>
+    <form method="post" action="{% url 'pay_for_item' item.id %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Submit Contribution</button>
+    </form>
+</div>
+{% endblock %}

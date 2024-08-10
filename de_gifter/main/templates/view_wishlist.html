@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}{{ wishlist.title }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center">
+    <h2>{{ wishlist.title }} Wishlist</h2>
+    <small>by: {{ wishlist.user.name }}</small>
+    {% if wishlist.days_left < 0 %}
+        <h3 class="expired-label">EXPIRED</h3>
+    {% endif %}
+</div>
+
+<p>{{ wishlist.description }}</p>
+
+{% if not shared %}
+<div class="mb-3">
+    {% if user.is_authenticated and user.id == wishlist.user.id %}
+        {% if wishlist.days_left >= 0 %}
+            <a href="{% url 'add_item_to_wishlist' wishlist.id %}" class="btn btn-primary">Add Item</a>
+            <button id="shareButton" class="btn btn-success" onclick="copyToClipboard('{% url 'view_wishlist' wishlist.id %}')">Share Wishlist</button>
+        {% else %}
+            <button class="btn btn-secondary" disabled>Add Item</button>
+            <button id="shareButton" class="btn btn-secondary" disabled>Share Wishlist</button>
+        {% endif %}
+        <div class="row">
+            <div class="col-md-12">
+                <form method="post" action="{% url 'update_expiry_date' wishlist.id %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="expiry_date">Expiry Date</label>
+                        <input type="date" class="form-control" id="expiry_date" name="expiry_date" value="{{ wishlist.expiry_date|date:'Y-m-d' }}" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Expiry Date</button>
+                </form>
+            </div>
+        </div>
+        <div class="card mt-4">
+            <div class="card-header">
+                Extra Cash
+            </div>
+            <div class="card-body">
+                <p><strong>Extra Cash Available:</strong> GH₵ {{ wishlist.extra_cash|floatformat:2 }}</p>
+                {% if wishlist.extra_cash > 0 %}
+                    <form method="post" action="{% url 'allocate_extra_cash' wishlist.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">Allocate Extra Cash to Items</button>
+                    </form>
+                {% endif %}
+                <h5 class="mt-3">Contributions Resulting in Extra Cash:</h5>
+                <ul style="list-style-type: none; padding-left: 0;">
+                    {% for item in wishlist.items.all %}
+                        {% for contribution in item.contributions.all %}
+                            {% if contribution.amount > item.item_price %}
+                                <li>
+                                    <p><strong>GH₵ {{ contribution.amount|floatformat:2 }}</strong> contributed by <strong>{{ contribution.name }}</strong><br>
+                                    <em>{{ contribution.message }}</em><br>
+                                    <small class="text-right">{{ contribution.timestamp|date:"Y-m-d H:i:s" }}</small></p>
+                                </li>
+                                <hr>
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="row mt-4">
+    {% for item in items %}
+        <div class="col-md-4 mb-4">
+            <div class="card {% if item.status == 'Filled' %}bg-secondary text-white{% endif %}">
+                {% load static %}
+                <img src="{% if item.item_image_url %}{{ item.item_image_url }}{% else %}{% static 'images/default_image.jpg' %}{% endif %}" class="card-img-top img-thumbnail" alt="{{ item.item_name }}" style="height: 150px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.item_name }}</h5>
+                    {% if item.status == 'Filled' %}
+                    <h5 style="display: inline-block">
+                        COMPLETED
+                        <img src="{% static 'images/greencheck.svg' %}" style="margin-left: 20px; width: 30px; height: 30px;" alt="checked">
+                    </h5>
+                    {% endif %}
+                    <p class="card-text">{{ item.item_description }}</p>
+                    {% if item.status == 'Partially Filled' %}
+                        <p class="card-text">
+                            <strong>Initial Price:</strong> <del>GH₵ {{ item.item_price|floatformat:2 }}</del>
+                            <br><strong>Remaining:</strong> GH₵ {{ item.remaining_amount|floatformat:2 }}
+                        </p>
+                    {% else %}
+                        <p class="card-text"><strong>Price:</strong> GH₵ {{ item.item_price|floatformat:2 }}</p>
+                    {% endif %}
+                    <p class="card-text"><strong>Status:</strong> {{ item.status }}</p>
+                    {% if user.is_authenticated and user.id == wishlist.user.id and item.status != 'Filled' %}
+                        {% if wishlist.days_left >= 0 %}
+                            <form method="post" action="{% url 'remove_item_from_wishlist' item.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Remove</button>
+                            </form>
+                            {% if not item.item_id %}
+                            <a href="{% url 'edit_custom_item' item.id %}" class="btn btn-secondary mt-2">Edit</a>
+                            {% endif %}
+                        {% endif %}
+                    {% elif item.status != 'Filled' %}
+                        <a href="{% url 'pay_for_item' item.id %}" class="btn btn-primary">Contribute</a>
+                    {% endif %}
+
+<!--                    display contributions and their information-->
+                    <h6 class="mt-3">Contributions:</h6>
+                    {% if item.contributors %}
+                        <ul style="list-style-type: none; padding-left: 0;">
+                            {% for contributor in item.contributors %}
+                            <li>
+                                <p><strong>GH₵ {{ contributor.total_contributed|floatformat:2 }}</strong> contributed by <strong>{{ contributor.name }}</strong></p>
+                            </li>
+                            <hr>
+                            {% endfor %}
+                        </ul>
+                        {% if item.excess_contribution %}
+                        <p><strong>Amount from contributors' contributions sent to extra cash:</strong> GH₵ {{ item.excess_contribution|floatformat:2 }}</p>
+                        {% endif %}
+                    {% else %}
+                        <p>No contributions yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+
+{% if user.is_authenticated and user.id == wishlist.user.id %}
+    {% if wishlist.days_left >= 0 %}
+        <a href="{% url 'add_item_to_wishlist' wishlist.id %}" class="btn btn-primary">Add Item</a>
+    {% else %}
+        <button class="btn btn-secondary" disabled>Add Item</button>
+    {% endif %}
+{% endif %}
+
+<script>
+function copyToClipboard(link) {
+    navigator.clipboard.writeText(link).then(function() {
+        alert('Wishlist link copied to clipboard!');
+    }, function(err) {
+        console.error('Error copying link: ', err);
+    });
+}
+</script>
+
+{% endblock %}
+
+

@@ -1,0 +1,8 @@
+<!-- templates/vendor_acc_active_email.html -->
+
+Hi {{ vendor.name }},
+
+Please click on the link below to confirm your email and complete the registration of your account:
+<a href="http://{{ domain }}{% url 'activate_vendor' uidb64=uid token=token %}">Activate your account</a>
+
+Thank you!

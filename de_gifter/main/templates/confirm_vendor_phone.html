@@ -1,0 +1,24 @@
+<!-- templates/confirm_vendor_phone.html -->
+
+{% extends "base.html" %}
+
+{% block title %}Confirm Phone Number{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="mt-5">Confirm Phone Number</h2>
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-primary">Confirm</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
