@@ -2,21 +2,18 @@ from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
 
+app_name = 'main'
+
 urlpatterns = [
     path('register/', views.register, name='register'),
     path('login/', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
     path('', views.home, name='home'),
-    path('update_vendor/<int:vendor_id>/', views.update_vendor, name='update_vendor'),
-    path('vendors/', views.vendor_list, name='vendor_list'),
+    path('gift_item/<int:wishlist_id>/<int:item_id>/', views.gift_item, name='gift_item'),
     path('register/', views.register, name='register'),
     path('activate/<uidb64>/<token>/', views.activate, name='activate'),
     path('confirm_phone/<uidb64>/', views.confirm_phone, name='confirm_phone'),
     path('resend_pin/', views.resend_pin, name='resend_pin'),
-    path('register_vendor/', views.register_vendor, name='register_vendor'),
-    path('activate_vendor/<uidb64>/<token>/', views.activate_vendor, name='activate_vendor'),
-    path('confirm_vendor_phone/<uidb64>/', views.confirm_vendor_phone, name='confirm_vendor_phone'),
-    path('resend_vendor_pin/', views.resend_vendor_pin, name='resend_vendor_pin'),
     path('create_wishlist/', views.create_wishlist, name='create_wishlist'),
     path('edit_wishlist/<int:wishlist_id>/', views.edit_wishlist, name='edit_wishlist'),
     path('wishlists/', views.view_wishlists, name='wishlists'),
@@ -36,8 +33,6 @@ urlpatterns = [
     path('reset_password_complete/',
          auth_views.PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'),
          name='password_reset_complete'),
-    path('activate_vendor/<uidb64>/<token>/', views.activate_vendor, name='activate_vendor'),
-    path('register_vendor/', views.register_vendor, name='register_vendor'),
     path('resend_pin/', views.resend_pin, name='resend_pin'),
     path('profile/', views.edit_profile, name='profile'),
     path('add_item_to_wishlist/', views.add_item_to_wishlist, name='add_item_to_wishlist'),

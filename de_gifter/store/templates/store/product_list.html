@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Product List</h1>
+    {% for product in products %}
+        <div class="product-card">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            <h3>{{ product.name }}</h3>
+            <p>{{ product.description }}</p>
+            <p>Price: GH₵ {{ product.price }}</p>
+            <a href="{% url 'product_detail' product.id %}">View Details</a>
+            <a href="{% url 'add_to_cart' product.id %}" class="btn btn-primary">Buy</a>
+            <a href="{% url 'gift_to_wishlist' product.id %}" class="btn btn-secondary">Gift</a>
+        </div>
+    {% endfor %}
+{% endblock %}

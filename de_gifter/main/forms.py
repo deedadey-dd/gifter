@@ -1,12 +1,12 @@
 from django import forms
-from .models import Item, ItemImage, Wishlist, WishlistItem, Vendor, User
+from .models import Item, ItemImage, Wishlist, WishlistItem, User
 from django.contrib.auth.forms import UserCreationForm
 
 
 class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        fields = ['name', 'description', 'price', 'vendor', 'category']
+        fields = ['name', 'description', 'price']
 
 
 class UserLoginForm(forms.Form):
@@ -47,17 +47,6 @@ class WishlistItemForm(forms.ModelForm):
     class Meta:
         model = WishlistItem
         fields = ['item_name', 'item_description', 'item_price', 'item_image_url']
-
-
-class VendorRegistrationForm(forms.ModelForm):
-    email = forms.EmailField(required=True)
-    phone_number = forms.CharField(max_length=20)
-    logo = forms.ImageField(required=False)
-    location = forms.CharField(max_length=255)
-
-    class Meta:
-        model = Vendor
-        fields = ['name', 'description', 'logo', 'phone_number', 'location', 'email']
 
 
 class StoreItemSearchForm(forms.Form):

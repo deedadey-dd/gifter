@@ -9,9 +9,9 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from .forms import (UserRegistrationForm, UserLoginForm, ItemForm, ItemImageForm, WishlistItemForm,
-                    VendorRegistrationForm, PhoneConfirmationForm, WishlistForm, StoreItemSearchForm, CustomItemForm,
+                    PhoneConfirmationForm, WishlistForm, StoreItemSearchForm, CustomItemForm,
                     ProfileForm, ContributionForm)
-from .models import User, Vendor, Category, Item, ItemImage, Wishlist, WishlistItem, Contribution
+from .models import User, Item, ItemImage, Wishlist, WishlistItem, Contribution
 from django.contrib import messages
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
@@ -21,6 +21,7 @@ from .tokens import account_activation_token
 import random
 import os
 from django.utils import timezone
+from store.models import Product
 
 
 sms_endpoint = os.environ['SMS_ENDPOINT']
@@ -35,11 +36,8 @@ all_colors = [
 
 
 def home(request):
-    items = Item.objects.all().order_by('-added_to_wishlist_count')
+    items = Product.objects.all().order_by('-popularity_count')
     wishlists = Wishlist.objects.filter(user=request.user) if request.user.is_authenticated else []
-
-    all_colors = ['009FBD', '3FA2F6', 'FF4191', '36BA98', '597445', 'E0A75E', 'FF6969', '06D001',
-                  '83B4FF', 'C738BD', 'A1DD70', 'D2649A', '40A578', 'FF76CE', 'AF8260', '41B06E', '5755FE']
 
     items_with_colors = [(item, random.choice(all_colors)) for item in items]
 
@@ -199,106 +197,6 @@ def item_list(request):
     return render(request, 'item_list.html', {'items': items})
 
 
-# def add_vendor(request):
-#     if request.method == 'POST':
-#         form = VendorRegistrationForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('vendor_list')
-#     else:
-#         form = VendorRegistrationForm()
-#     return render(request, 'add_vendor.html', {'form': form})
-
-
-def register_vendor(request):
-    if request.method == 'POST':
-        form = VendorRegistrationForm(request.POST, request.FILES)
-        if form.is_valid():
-            vendor = form.save(commit=False)
-            vendor.generate_confirmation_pin()
-            vendor.save()
-            send_confirmation_email(request, vendor)
-            messages.success(request, 'Please confirm your email and phone number to complete registration.')
-            return redirect('login')
-    else:
-        form = VendorRegistrationForm()
-    return render(request, 'register_vendor.html', {'form': form})
-
-
-def send_vendor_confirmation_email(request, vendor):
-    mail_subject = 'Activate your account.'
-    message = render_to_string('vendor_acc_active_email.html', {
-        'vendor': vendor,
-        'domain': request.META['HTTP_HOST'],
-        'uid': urlsafe_base64_encode(force_bytes(vendor.pk)),
-        'token': account_activation_token.make_token(vendor),
-    })
-    send_mail(mail_subject, message, from_email=os.environ['EMAIL_USER'], recipient_list=[vendor.email])
-
-
-def activate_vendor(request, uidb64, token):
-    try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        vendor = Vendor.objects.get(pk=uid)
-    except(TypeError, ValueError, OverflowError, Vendor.DoesNotExist):
-        vendor = None
-    if vendor is not None and account_activation_token.check_token(vendor, token):
-        vendor.email_confirmed = True
-        if vendor.phone_confirmed:
-            vendor.verification = 'verified'
-        vendor.save()
-        messages.success(request, 'Thank you for your email confirmation. Now you can login your account.')
-        return redirect('login')
-    else:
-        messages.error(request, 'Activation link is invalid!')
-        return redirect('register_vendor')
-
-
-def confirm_vendor_phone(request, uidb64):
-    vendor = get_object_or_404(Vendor, pk=force_str(urlsafe_base64_decode(uidb64)))
-    if request.method == 'POST':
-        form = PhoneConfirmationForm(request.POST)
-        if form.is_valid():
-            if form.cleaned_data['pin'] == vendor.phone_confirmation_pin:
-                vendor.phone_confirmed = True
-                if vendor.email_confirmed:
-                    vendor.verification = 'verified'
-                vendor.save()
-                messages.success(request, 'Your phone number has been confirmed.')
-                return redirect('login')
-            else:
-                messages.error(request, 'Invalid PIN. Please try again.')
-    else:
-        form = PhoneConfirmationForm()
-    return render(request, 'confirm_vendor_phone.html', {'form': form, 'uid': uidb64})
-
-
-@login_required
-def resend_vendor_pin(request):
-    vendor = request.user.vendor
-    vendor.generate_confirmation_pin()
-    # Implement logic to send the pin to the vendor's phone number
-    messages.success(request, 'A new PIN has been sent to your phone number.')
-    return redirect('confirm_vendor_phone', uidb64=urlsafe_base64_encode(force_bytes(vendor.pk)))
-
-
-def update_vendor(request, vendor_id):
-    vendor = get_object_or_404(Vendor, pk=vendor_id)
-    if request.method == 'POST':
-        form = VendorRegistrationForm(request.POST, request.FILES, instance=vendor)
-        if form.is_valid():
-            form.save()
-            return redirect('vendor_list')
-    else:
-        form = VendorRegistrationForm(instance=vendor)
-    return render(request, 'update_vendor.html', {'form': form})
-
-
-def vendor_list(request):
-    vendors = Vendor.objects.all()
-    return render(request, 'vendor_list.html', {'vendors': vendors})
-
-
 @login_required
 def create_wishlist(request):
     if request.method == 'POST':
@@ -392,6 +290,7 @@ def view_wishlist(request, wishlist_id):
         excess_amount = max(total_contributed - item.item_price, 0)
         item.excess_contribution = excess_amount
 
+    # Calculate and show days left on the wishlist
     today = timezone.now().date()
     wishlist.days_left = (wishlist.expiry_date - today).days
 
@@ -400,6 +299,7 @@ def view_wishlist(request, wishlist_id):
         'items': items,
         'user': request.user  # Pass the current user to the template
     }
+
     print(wishlist.days_left)
     return render(request, 'view_wishlist.html', context)
 
@@ -575,7 +475,6 @@ def edit_custom_item(request, item_id):
 def pay_for_item(request, item_id):
     item = get_object_or_404(WishlistItem, id=item_id)
     wishlist = item.wishlist
-    next_items = wishlist.items.filter(status='Pending').order_by('id')
 
     if request.method == 'POST':
         form = ContributionForm(request.POST)
@@ -585,41 +484,42 @@ def pay_for_item(request, item_id):
             contributor_name = form.cleaned_data['name']
             contributor_phone = form.cleaned_data['phone']
 
-            # this is the remaining contribution money
-            remaining_amount = amount
+            # Calculate how much can be contributed to the item and how much will be extra
+            contribution_amount = min(amount, item.item_price - item.amount_paid)
+            extra_cash = amount - contribution_amount
 
-            for next_item in next_items:
-                if remaining_amount <= 0:
-                    break
-                if next_item.status == 'Filled':
-                    continue
+            # Update item amount_paid and status
+            item.amount_paid += contribution_amount
+            if item.amount_paid >= item.item_price:
+                item.amount_paid = item.item_price
+                item.status = 'Filled'
+            elif item.amount_paid > 0:
+                item.status = 'Partially Filled'
+            item.save()
 
-                if remaining_amount >= next_item.item_price - next_item.amount_paid:
-                    contribution_amount = next_item.item_price - next_item.amount_paid
-                    next_item.amount_paid = next_item.item_price
-                    next_item.status = 'Filled'
-                else:
-                    contribution_amount = remaining_amount
-                    next_item.amount_paid += contribution_amount
-                    next_item.status = 'Partially Filled'
+            # Save contribution
+            Contribution.objects.create(
+                wishlist_item=item,
+                name=contributor_name,
+                amount=contribution_amount,
+                message=message,
+                phone=contributor_phone,
+            )
 
-                remaining_amount -= contribution_amount
+            print(amount)
+            print(type(amount))
 
-                # Save contribution
-                Contribution.objects.create(
-                    wishlist_item=next_item,
-                    name=contributor_name,
-                    amount=contribution_amount,
-                    message=message,
-                    phone=contributor_phone,
-                )
+            # Update extra cash
+            if hasattr(wishlist, 'extra_cash'):
+                wishlist.extra_cash += extra_cash
+            else:
+                wishlist.extra_cash = extra_cash
+            wishlist.save()
 
-                next_item.save()
-
-            # Add remaining amount to extra cash if not all used
-            if remaining_amount > 0:
-                wishlist.extra_cash += remaining_amount
-                wishlist.save()
+            # Add excess to user's cash on hand if applicable
+            if extra_cash > 0:
+                wishlist.user.cash_on_hand += extra_cash
+                wishlist.user.save()
 
             messages.success(request, 'Your contribution has been successfully processed!')
             return redirect('view_wishlist', wishlist_id=wishlist.id)
@@ -657,3 +557,63 @@ def allocate_extra_cash(request, wishlist_id):
     messages.success(request, 'Extra cash allocated to items successfully.')
     return redirect('view_wishlist', wishlist_id=wishlist_id)
 
+
+# Gifting an item to someone
+def gift_item(request, wishlist_id, item_id):
+    wishlist = get_object_or_404(Wishlist, id=wishlist_id)
+    item = get_object_or_404(Item, id=item_id)
+
+    if request.method == 'POST':
+        contribution_amount = float(request.POST.get('contribution_amount', 0))
+        giver_name = request.POST.get('giver_name')
+        giver_email = request.POST.get('giver_email')
+        giver_phone = request.POST.get('giver_phone')
+        message = request.POST.get('message')
+
+        success, msg = handle_contribution(
+            item, contribution_amount, giver_name, giver_email, giver_phone, message
+        )
+        if not success:
+            messages.error(request, msg)
+            return redirect('gift_item', wishlist_id=wishlist_id, item_id=item_id)
+
+        messages.success(request, msg)
+        return redirect('home')
+
+    return render(request, 'gift_item.html', {'wishlist': wishlist, 'item': item})
+
+
+def handle_contribution(item, amount, name, email, phone, message):
+    # Check if contribution amount is valid
+    if amount < item.item_price:
+        return False, "Contribution must be equal to or greater than the item price!"
+
+    # Update item amount_paid and status
+    item.amount_paid += amount
+    if item.amount_paid >= item.item_price:
+        item.status = 'Filled'
+    else:
+        item.status = 'Partially Filled'
+
+    # Save item status and amount_paid changes
+    item.save()
+
+    # Create and save the contribution record
+    contribution = Contribution(
+        item=item,
+        name=name,
+        email=email,
+        phone=phone,
+        amount=amount,
+        message=message
+    )
+    contribution.save()
+
+    # Calculate and update extra cash if any
+    extra_amount = amount - item.item_price
+    if extra_amount > 0:
+        # Ensure you handle this with appropriate logic for your cash handling
+        item.wishlist.user.cash_on_hand += extra_amount
+        item.wishlist.user.save()  # Save the updated user cash
+
+    return True, "Contribution successful!"

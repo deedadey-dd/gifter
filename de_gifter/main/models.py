@@ -41,64 +41,10 @@ class User(AbstractUser):
         return self.username
 
 
-class Vendor(models.Model):
-    STATUS_CHOICES = [
-        ('active', 'Active'),
-        ('inactive', 'Inactive'),
-        ('recently_seen', 'Recently Seen')
-    ]
-
-    VERIFICATION_CHOICES = [
-        ('pending', 'Pending'),
-        ('verified', 'Verified'),
-        ('rejected', 'Rejected')
-    ]
-
-    name = models.CharField(max_length=150)
-    description = models.TextField()
-    logo = models.ImageField(upload_to='uploads/vendors/', null=True, blank=True)
-    phone_number = models.CharField(max_length=20)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='recently_seen')
-    last_seen = models.DateTimeField(default=timezone.now)
-    verification = models.CharField(max_length=20, choices=VERIFICATION_CHOICES, default='pending')
-    location = models.CharField(max_length=255)
-    email = models.EmailField(unique=True)
-    email_confirmed = models.BooleanField(default=False)
-    phone_confirmed = models.BooleanField(default=False)
-    phone_confirmation_pin = models.CharField(max_length=6, blank=True, null=True)
-
-    def generate_confirmation_pin(self):
-        self.phone_confirmation_pin = ''.join(random.choices(string.digits, k=6))
-        self.save()
-
-    def save(self, *args, **kwargs):
-        if self.last_seen:
-            now = timezone.now()
-            if now - self.last_seen < timezone.timedelta(days=45):
-                self.status = 'active'
-            elif now - self.last_seen > timezone.timedelta(days=90):
-                self.status = 'inactive'
-            else:
-                self.status = 'recently_seen'
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
-
-
-class Category(models.Model):
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-
 class Item(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     price = models.FloatField()
-    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='items')
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='items')
     added_to_wishlist_count = models.IntegerField(default=0)
 
     def __str__(self):
