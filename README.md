@@ -1,4 +1,5 @@
-Gifter is an e-comerce website that uses the development of wishlists to create an avenue for people to gift their loved ones with the exact items they want. 
+Gifter is an e-comerce website that uses the development of wishlists 
+to create an avenue for people to gift their loved ones with the exact items they want. 
 
 The site opens with a store with products that can be PURCHASED at once or GIFTED to other users who have created WISHLISTS. 
 
