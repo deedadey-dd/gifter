@@ -2,13 +2,13 @@ from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
 
-app_name = 'main'
+# app_name = 'main'
 
 urlpatterns = [
+    path('', views.home, name='home'),
     path('register/', views.register, name='register'),
     path('login/', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
-    path('', views.home, name='home'),
     path('gift_item/<int:wishlist_id>/<int:item_id>/', views.gift_item, name='gift_item'),
     path('register/', views.register, name='register'),
     path('activate/<uidb64>/<token>/', views.activate, name='activate'),

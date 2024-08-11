@@ -4,6 +4,7 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.views import PasswordResetView
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
+from django.http import HttpResponseBadRequest
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
@@ -560,6 +561,10 @@ def allocate_extra_cash(request, wishlist_id):
 
 # Gifting an item to someone
 def gift_item(request, wishlist_id, item_id):
+    # Validate IDs
+    if not wishlist_id or not item_id:
+        return HttpResponseBadRequest("Invalid wishlist_id or item_id")
+
     wishlist = get_object_or_404(Wishlist, id=wishlist_id)
     item = get_object_or_404(Item, id=item_id)
 
@@ -581,6 +586,7 @@ def gift_item(request, wishlist_id, item_id):
         return redirect('home')
 
     return render(request, 'gift_item.html', {'wishlist': wishlist, 'item': item})
+
 
 
 def handle_contribution(item, amount, name, email, phone, message):

@@ -1,0 +1,19 @@
+<!-- store/templates/store/buy_item.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Buy {{ product.name }}</h2>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <h3>Order Details</h3>
+    {{ order_form.as_p }}
+
+    <h3>Shipping Details</h3>
+    {{ shipping_form.as_p }}
+
+    <button type="submit">Place Order</button>
+  </form>
+{% endblock %}

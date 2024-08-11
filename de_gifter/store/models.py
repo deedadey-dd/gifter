@@ -91,6 +91,10 @@ class ProductImage(models.Model):
 
 
 class Order(models.Model):
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Completed', 'Completed')
+    ]
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     products = models.ManyToManyField(Product, through='OrderItem')
     total_amount = models.FloatField()
@@ -121,4 +125,18 @@ def process_transaction(product_id, amount_paid):
     # e.g., update the vendor's earnings in the database or perform other actions
 
     return vendor_earnings, fee_amount
+
+class ShippingDetails(models.Model):
+    order = models.OneToOneField('Order', on_delete=models.CASCADE)
+    address = models.CharField(max_length=255)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    postal_code = models.CharField(max_length=20)
+    country = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    shipping_method = models.CharField(max_length=100, choices=[('Standard', 'Standard'), ('Express', 'Express')])
+    tracking_number = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return f"Shipping details for Order {self.order.id}"
 

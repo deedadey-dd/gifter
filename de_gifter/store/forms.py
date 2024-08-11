@@ -1,18 +1,15 @@
 # store/forms.py
 
 from django import forms
-from .models import Order  # Adjust import based on your project structure
+from .models import Order, OrderItem, ShippingDetails  # Adjust import based on your project structure
 
 
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = ['customer_name', 'customer_email', 'customer_phone', 'shipping_address', 'billing_address',
-                  'payment_method']
-
+        fields = ['total_amount', 'status']
         widgets = {
-            'shipping_address': forms.Textarea(attrs={'rows': 3}),
-            'billing_address': forms.Textarea(attrs={'rows': 3}),
+            'status': forms.Select(choices=Order.STATUS_CHOICES),
         }
 
     def clean_payment_method(self):
@@ -20,3 +17,15 @@ class OrderForm(forms.ModelForm):
         if payment_method not in ['Credit Card', 'PayPal', 'Bank Transfer']:
             raise forms.ValidationError("Invalid payment method")
         return payment_method
+
+
+class OrderItemForm(forms.ModelForm):
+    class Meta:
+        model = OrderItem
+        fields = ['product', 'quantity']
+
+
+class ShippingDetailsForm(forms.ModelForm):
+    class Meta:
+        model = ShippingDetails
+        fields = ['address', 'city', 'state', 'postal_code', 'country', 'phone_number', 'shipping_method', 'tracking_number']
