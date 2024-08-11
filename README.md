@@ -38,6 +38,8 @@ Prerequisites
 Python 3.6+
 Django 3.2+
 Virtualenv (recommended)
+
+
 Installation
 1. Clone the repository
 
@@ -93,7 +95,7 @@ de_gifter/
 ├── manage.py
 ├── db.sqlite3
 ├── main/
-│   ├── migrations
+│   ├── migrations/
 │   ├── __init__.py
 │   ├── admin.py
 │   ├── apps.py
@@ -104,19 +106,19 @@ de_gifter/
 │   ├── views.py
 │   └── static/
 │       └── css/
-│           ├── styles.css
+│           └── styles.css
 │   └── templates/
 │       ├── register.html
 │       ├── login.html
 │       ├── index.html
-│       └── all_other_html_files
+│       └── all_other_html_files/
 ├── media/
 │   └── images/
 │       └── greencheck.svg
 │   └── items/
-│   └── uploads/
-│       └── profiles/
-│           └── profile_pictures
+│       └── uploads/
+│           └── profiles/
+│               └── profile_pictures/
 │   └── vendors/
 ├── store/
 │   ├── __init__.py
@@ -126,15 +128,15 @@ de_gifter/
 │   ├── models.py
 │   ├── tests.py
 │   ├── urls.py
-│   └── views.py
+│   ├── views.py
 │   └── templates/
 │       └── store/
 │           ├── checkout.html
 │           ├── product_detail.html
 │           ├── product_list.html
-│           └── other_html_files
-|            
+│           └── other_html_files/
 └── requirements.txt
+
 
 Contributing
 We welcome contributions to gifter! To contribute:
