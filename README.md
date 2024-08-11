@@ -85,6 +85,7 @@ python manage.py runserver
 You can now access the application at http://127.0.0.1:8000/.
 
 Project Structure
+```markdown
 de_gifter/
 ├── de_gifter/
 │   ├── __init__.py
@@ -136,7 +137,7 @@ de_gifter/
 │           ├── product_list.html
 │           └── other_html_files/
 └── requirements.txt
-
+```
 
 Contributing
 We welcome contributions to gifter! To contribute:
