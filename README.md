@@ -1,3 +1,5 @@
+## Introduction
+
 Gifter is an e-comerce website that uses the development of wishlists 
 to create an avenue for people to gift their loved ones with the exact items they want. 
 
@@ -12,18 +14,7 @@ The website is built on the django framework of with modules that have been comp
 After installing the modules in the requirements.txt, the platform can be run using its 'manage.py runserver'
 
 
-for testing purposes, 
-an ordinary user account has been set up with the following credentials
-username: user1
-password: gifted1234
-
-a vendor has been created with the following credentials
-username: vendor1
-password: gifted1234
-
-
-
-Features
+## Features
 User registration and authentication
 Create and manage wishlists
 Add items to wishlists from various e-commerce sites
@@ -41,9 +32,9 @@ Virtualenv (recommended)
 
 
 Installation
-1. Clone the repository
+### 1. Clone the repository
 
-2. Set up a virtual environment
+### 2. Set up a virtual environment
 It's recommended to use a virtual environment to manage dependencies. You can set up a virtual environment using venv or virtualenv.
 
 Using venv (Python 3.6+):
@@ -54,14 +45,17 @@ Using virtualenv:
 
 virtualenv venv
 source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-3. Install dependencies
+
+### 3. Install dependencies
 pip install -r requirements.txt
-4. Set up the database
+
+### 4. Set up the database
 Apply the migrations to set up the database:
 
 python manage.py makemigrations
 python manage.py migrate
-5. Creating new users
+
+### 5. Creating new users
 Because Authentication is done via email and phone verifications you could create users and 
 manually go into the database to retrieve the pin since the environment variables needed
 to make those requests work are not included (email sending and phone text message sending)
@@ -76,15 +70,17 @@ username: vendor1
 password: gifted1234
 
 
+Althernatively, you could create a superuser and used that to add users\
 
 python manage.py createsuperuser
-6. Run the development server
+
+### 6. Run the development server
 Start the Django development server:
 
 python manage.py runserver
 You can now access the application at http://127.0.0.1:8000/.
 
-Project Structure
+### Project Structure
 ```markdown
 de_gifter/
 ├── de_gifter/
@@ -139,7 +135,7 @@ de_gifter/
 └── requirements.txt
 ```
 
-Contributing
+## Contributing
 We welcome contributions to gifter! To contribute:
 
 Fork the repository
