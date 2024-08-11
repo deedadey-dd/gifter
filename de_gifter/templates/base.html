@@ -34,7 +34,7 @@
                             {% if user.profile_picture %}
                                 <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}'s profile picture" class="rounded-circle" width="30" height="30">
                             {% else %}
-                                Profile
+                                <img src="{{ STATIC_URL }}/default-profile.svg" alt="Profile Picture" class="rounded-circle" width="30" height="30">
                             {% endif %}
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">

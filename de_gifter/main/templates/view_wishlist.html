@@ -18,7 +18,7 @@
     {% if user.is_authenticated and user.id == wishlist.user.id %}
         {% if wishlist.days_left >= 0 %}
             <a href="{% url 'add_item_to_wishlist' wishlist.id %}" class="btn btn-primary">Add Item</a>
-            <button id="shareButton" class="btn btn-success" onclick="copyToClipboard('{% url 'view_wishlist' wishlist.id %}')">Share Wishlist</button>
+            <button id="shareButton" class="btn btn-success" onclick="copyToClipboard('{{ full_url }}')">Share Wishlist</button>
         {% else %}
             <button class="btn btn-secondary" disabled>Add Item</button>
             <button id="shareButton" class="btn btn-secondary" disabled>Share Wishlist</button>

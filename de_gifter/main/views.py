@@ -8,7 +8,7 @@ from django.http import HttpResponseBadRequest
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from .forms import (UserRegistrationForm, UserLoginForm, ItemForm, ItemImageForm, WishlistItemForm,
                     PhoneConfirmationForm, WishlistForm, StoreItemSearchForm, CustomItemForm,
                     ProfileForm, ContributionForm)
@@ -55,8 +55,7 @@ def register(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.is_active = False  # Deactivate account until email is confirmed
-            phone_pin = user.generate_confirmation_pin()
-            print(phone_pin)
+            user.generate_confirmation_pin()
             user.save()
             send_confirmation_email(request, user)
             messages.success(request, 'Please confirm your email and phone number to complete registration.')
@@ -295,10 +294,13 @@ def view_wishlist(request, wishlist_id):
     today = timezone.now().date()
     wishlist.days_left = (wishlist.expiry_date - today).days
 
+    full_url = request.build_absolute_uri(reverse('view_wishlist', kwargs={'wishlist_id': wishlist_id}))
+
     context = {
         'wishlist': wishlist,
         'items': items,
-        'user': request.user  # Pass the current user to the template
+        'user': request.user,  # Pass the current user to the template
+        'full_url': full_url,
     }
 
     print(wishlist.days_left)
@@ -586,7 +588,6 @@ def gift_item(request, wishlist_id, item_id):
         return redirect('home')
 
     return render(request, 'gift_item.html', {'wishlist': wishlist, 'item': item})
-
 
 
 def handle_contribution(item, amount, name, email, phone, message):
