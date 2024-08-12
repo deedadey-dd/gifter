@@ -46,7 +46,10 @@ class WishlistForm(forms.ModelForm):
 class WishlistItemForm(forms.ModelForm):
     class Meta:
         model = WishlistItem
-        fields = ['item_name', 'item_description', 'item_price', 'item_image_url']
+        fields = ['item_name', 'item_description', 'item_price', 'item_image_url', 'item_image']
+        widgets = {
+            'item_image': forms.ClearableFileInput(attrs={'multiple': False}),  # Widget to handle file uploads
+        }
 
 
 class StoreItemSearchForm(forms.Form):
@@ -56,7 +59,10 @@ class StoreItemSearchForm(forms.Form):
 class CustomItemForm(forms.ModelForm):
     class Meta:
         model = WishlistItem
-        fields = ['item_name', 'item_description', 'item_price', 'item_image_url']
+        fields = ['item_name', 'item_description', 'item_price', 'item_image_url', 'item_image']
+        widgets = {
+            'item_image': forms.ClearableFileInput(attrs={'multiple': False}),  # Widget to handle file uploads
+        }
 
 
 class ItemImageForm(forms.ModelForm):

@@ -1,5 +1,6 @@
 import random
 
+from django.contrib.auth.hashers import make_password, check_password
 from django.db import models
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -40,7 +41,15 @@ class Vendor(models.Model):
     email_confirmed = models.BooleanField(default=False)
     phone_confirmed = models.BooleanField(default=False)
     phone_confirmation_pin = models.CharField(max_length=6, blank=True, null=True)
+    password = models.CharField(max_length=255, default='1234gifted1234')  # Store hashed password
     fee_percentage = models.FloatField(default=5.0)  # Fee percentage for each transaction
+
+    def set_password(self, raw_password):
+        self.password = make_password(raw_password)
+        self.save()
+
+    def check_password(self, raw_password):
+        return check_password(raw_password, self.password)
 
     def generate_confirmation_pin(self):
         self.phone_confirmation_pin = ''.join(random.choices(string.digits, k=6))
@@ -125,6 +134,7 @@ def process_transaction(product_id, amount_paid):
     # e.g., update the vendor's earnings in the database or perform other actions
 
     return vendor_earnings, fee_amount
+
 
 class ShippingDetails(models.Model):
     order = models.OneToOneField('Order', on_delete=models.CASCADE)

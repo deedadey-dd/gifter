@@ -1,8 +1,22 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Product, Category, Order, OrderItem, Vendor
-from .forms import OrderForm  # Define this form for handling orders
+from .forms import ProductForm, OrderForm, ShippingDetailsForm
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+
+
+def add_product(request):
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Product added successfully!')
+            return redirect('product_list')  # Adjust this to your desired redirect URL
+    else:
+        form = ProductForm()
+
+    return render(request, 'store/add_product.html', {'form': form})
 
 
 def product_list(request):
@@ -13,7 +27,7 @@ def product_list(request):
 
 def product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    return render(request, 'product_detail.html', {'product': product})
+    return render(request, 'store/product_detail.html', {'product': product})
 
 
 def add_to_cart(request, product_id):
@@ -62,7 +76,7 @@ def create_order(request):
         order_form = OrderForm()
         shipping_form = ShippingDetailsForm()
 
-    return render(request, 'create_order.html', {'order_form': order_form, 'shipping_form': shipping_form})
+    return render(request, 'store/create_order.html', {'order_form': order_form, 'shipping_form': shipping_form})
 
 
 @login_required

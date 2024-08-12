@@ -42,27 +42,31 @@
 
     <!-- Custom Item Form Section -->
     <div class="col-md-4">
-        <h3 class="mt-5">Add Custom Item</h3>
-        <form method="POST" enctype="multipart/form-data" action="{% url 'add_item_to_wishlist' wishlist.id %}">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="custom_name">Item Name</label>
-                {{ custom_item_form.item_name }}
-            </div>
-            <div class="form-group">
-                <label for="custom_description">Item Description</label>
-                {{ custom_item_form.item_description }}
-            </div>
-            <div class="form-group">
-                <label for="custom_price">Item Price</label>
-                {{ custom_item_form.item_price }}
-            </div>
-            <div class="form-group">
-                <label for="custom_image">Item Image</label>
-                {{ custom_item_form.item_image_url }}
-            </div>
-            <button type="submit" class="btn btn-primary">Add Custom Item</button>
-        </form>
-    </div>
+    <h3 class="mt-5">Add Custom Item</h3>
+    <form method="POST" enctype="multipart/form-data" action="{% url 'add_item_to_wishlist' wishlist.id %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="custom_name">Item Name</label>
+            {{ custom_item_form.item_name }}
+        </div>
+        <div class="form-group">
+            <label for="custom_description">Item Description</label>
+            {{ custom_item_form.item_description }}
+        </div>
+        <div class="form-group">
+            <label for="custom_price">Item Price</label>
+            {{ custom_item_form.item_price }}
+        </div>
+        <div class="form-group">
+            <label for="custom_image_url">Item URL (optional)</label>
+            {{ custom_item_form.item_image_url }}
+        </div>
+        <div class="form-group">
+            <label for="custom_image">Item Image</label>
+            {{ custom_item_form.item_image }}
+        </div>
+        <button type="submit" class="btn btn-primary">Add Custom Item</button>
+    </form>
+</div>
 </div>
 {% endblock %}

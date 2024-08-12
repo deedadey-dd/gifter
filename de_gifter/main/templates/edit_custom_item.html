@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Item{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Edit Item</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Update Item</button>
+    </form>
+    <a href="{% url 'view_wishlist' wishlist_id=item.wishlist.id %}" class="btn btn-secondary mt-3">Back to Wishlist</a>
+</div>
+{% endblock %}

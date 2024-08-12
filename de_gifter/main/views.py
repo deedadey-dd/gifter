@@ -22,7 +22,7 @@ from .tokens import account_activation_token
 import random
 import os
 from django.utils import timezone
-from store.models import Product
+from store.models import Product, Vendor
 
 
 sms_endpoint = os.environ['SMS_ENDPOINT']
@@ -155,13 +155,39 @@ def resend_pin(request):
     return redirect('confirm_phone', uidb64=urlsafe_base64_encode(force_bytes(user.pk)))
 
 
+# This view if for only users the next view will incorporate vendor login as well
+# def user_login(request):
+#     if request.method == 'POST':
+#         form = UserLoginForm(request.POST)
+#         if form.is_valid():
+#             identifier = form.cleaned_data.get('identifier')
+#             password = form.cleaned_data.get('password')
+#             user = authenticate(request, username=identifier, password=password) or authenticate(request, email=identifier, password=password)
+#             if user is not None:
+#                 login(request, user)
+#                 return redirect('home')
+#             else:
+#                 messages.error(request, 'Invalid username/email or password')
+#     else:
+#         form = UserLoginForm()
+#     return render(request, 'login.html', {'form': form})
+
+
 def user_login(request):
     if request.method == 'POST':
         form = UserLoginForm(request.POST)
         if form.is_valid():
             identifier = form.cleaned_data.get('identifier')
             password = form.cleaned_data.get('password')
+
+            # Authenticate User
             user = authenticate(request, username=identifier, password=password) or authenticate(request, email=identifier, password=password)
+
+            # Authenticate Vendor
+            vendor = Vendor.objects.filter(email=identifier).first()
+            if vendor and vendor.check_password(password):
+                user = vendor  # Treat vendor as user if authenticated
+
             if user is not None:
                 login(request, user)
                 return redirect('home')
@@ -253,7 +279,7 @@ def add_store_item_to_wishlist(request, wishlist_id, item_id):
 def add_custom_item_to_wishlist(request, wishlist_id):
     wishlist = get_object_or_404(Wishlist, id=wishlist_id, user=request.user)
     if request.method == 'POST':
-        form = WishlistItemForm(request.POST)
+        form = WishlistItemForm(request.POST, request.FILES)
         if form.is_valid():
             wishlist_item = form.save(commit=False)
             wishlist_item.wishlist = wishlist

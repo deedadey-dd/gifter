@@ -75,7 +75,7 @@
         <div class="col-md-4 mb-4">
             <div class="card {% if item.status == 'Filled' %}bg-secondary text-white{% endif %}">
                 {% load static %}
-                <img src="{% if item.item_image_url %}{{ item.item_image_url }}{% else %}{% static 'images/default_image.jpg' %}{% endif %}" class="card-img-top img-thumbnail" alt="{{ item.item_name }}" style="height: 150px; object-fit: cover;">
+                <img src="{% if item.item_image %}{{ item.item_image.url }}{% else %}{% static 'images/default_image.jpg' %}{% endif %}" class="card-img-top img-thumbnail" alt="{{ item.item_name }}" style="height: 150px; object-fit: cover;">
                 <div class="card-body">
                     <h5 class="card-title">{{ item.item_name }}</h5>
                     {% if item.status == 'Filled' %}

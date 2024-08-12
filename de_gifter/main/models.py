@@ -86,9 +86,10 @@ class WishlistItem(models.Model):
     item_name = models.CharField(max_length=120)
     item_description = models.TextField(max_length=240, blank=True, null=True)
     item_price = models.FloatField()
-    item_image_url = models.URLField(max_length=240, blank=True, null=True)
+    item_image = models.ImageField(upload_to='uploads/items/', null=True, blank=True)  # This field is for image uploads
     status = models.CharField(max_length=20, default='Pending')
     amount_paid = models.FloatField(default=0.0)
+    item_image_url = models.URLField(max_length=150, null=True, blank=True)  # Optional URL field
 
     def __str__(self):
         return self.item_name

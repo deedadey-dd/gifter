@@ -26,7 +26,9 @@ SECRET_KEY = 'django-insecure-oz0kg&2n)mg93_h%c(drdl$$!0j=6ptouw#x5m6d4fdv3ro74%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# change this and replace with specific IPs or domains during production.
+
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -106,6 +108,12 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTH_USER_MODEL = 'main.User'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Default backend for users
+    'store.backends.VendorBackend',  # Custom backend for vendors
+]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
