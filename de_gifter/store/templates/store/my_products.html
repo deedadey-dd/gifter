@@ -1,0 +1,30 @@
+{% extends "store_base.html" %}
+
+{% block title %}My Products{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mt-5">My Products</h2>
+    <div class="row">
+        {% for product in products %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                    {% else %}
+                        <img src="{% static 'default-product.jpg' %}" class="card-img-top" alt="{{ product.name }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">{{ product.description }}</p>
+                        <p class="card-text">Price: ${{ product.price }}</p>
+                        <a href="{% url 'edit_product' product.id %}" class="btn btn-primary">Edit</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>You have no products listed.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

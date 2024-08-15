@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Product, Category, Order, OrderItem, Vendor
-from .forms import ProductForm, OrderForm, ShippingDetailsForm
+from .forms import ProductForm, OrderForm, ShippingDetailsForm, VendorProfileForm
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -137,3 +137,61 @@ def order_confirmation(request, order_id):
     return render(request, 'store/order_confirmation.html', {
         'order': order
     })
+
+
+@login_required
+def my_products(request):
+    # Get the vendor profile for the currently logged-in user
+    vendor = get_object_or_404(Vendor, user=request.user)
+
+    # Fetch products belonging to the vendor
+    products = vendor.products.all()
+
+    context = {
+        'products': products,
+    }
+    return render(request, 'store/my_products.html', context)
+
+
+@login_required
+def my_orders(request):
+    # Fetch orders for the logged-in vendor
+    vendor = getattr(request.user, 'vendor', None)  # Get the vendor instance if it exists
+    if vendor:
+        orders = Order.objects.filter(vendor=vendor)  # Assuming an Order model with a vendor field
+    else:
+        orders = []
+
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'store/my_orders.html', context)
+
+
+@login_required
+def vendor_profile(request):
+    # Get the vendor profile for the currently logged-in user
+    vendor = get_object_or_404(Vendor, user=request.user)
+
+    context = {
+        'vendor': vendor,
+    }
+    return render(request, 'store/vendor_profile.html', context)
+
+
+@login_required
+def edit_vendor_profile(request):
+    vendor = get_object_or_404(Vendor, user=request.user)
+
+    if request.method == 'POST':
+        form = VendorProfileForm(request.POST, request.FILES, instance=vendor)
+        if form.is_valid():
+            form.save()
+            return redirect('vendor_profile')
+    else:
+        form = VendorProfileForm(instance=vendor)
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'store/edit_vendor_profile.html', context)

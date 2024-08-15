@@ -1,0 +1,27 @@
+{% extends "store_base.html" %}
+
+{% block title %}Vendor Profile{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mt-5">Vendor Profile</h2>
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title">{{ vendor.name }}</h3>
+            {% if vendor.logo %}
+                <img src="{{ vendor.logo.url }}" alt="{{ vendor.name }}'s Logo" class="img-fluid mb-3" style="max-width: 150px;">
+            {% else %}
+                <img src="{% static 'default-logo.png' %}" alt="Default Logo" class="img-fluid mb-3" style="max-width: 150px;">
+            {% endif %}
+            <p><strong>Description:</strong> {{ vendor.description }}</p>
+            <p><strong>Email:</strong> {{ vendor.email }}</p>
+            <p><strong>Phone Number:</strong> {{ vendor.phone_number }}</p>
+            <p><strong>Status:</strong> {{ vendor.get_status_display }}</p>
+            <p><strong>Location:</strong> {{ vendor.location }}</p>
+            <p><strong>Verification Status:</strong> {{ vendor.get_verification_display }}</p>
+            <p><strong>Last Seen:</strong> {{ vendor.last_seen }}</p>
+            <a href="{% url 'edit_vendor_profile' %}" class="btn btn-primary">Edit Profile</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

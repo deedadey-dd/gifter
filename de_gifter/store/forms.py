@@ -1,7 +1,7 @@
 # store/forms.py
 
 from django import forms
-from .models import Product, Order, OrderItem, ShippingDetails  # Adjust import based on your project structure
+from .models import Product, Order, OrderItem, ShippingDetails, Vendor  # Adjust import based on your project structure
 
 
 class ProductForm(forms.ModelForm):
@@ -35,3 +35,9 @@ class ShippingDetailsForm(forms.ModelForm):
     class Meta:
         model = ShippingDetails
         fields = ['address', 'city', 'state', 'postal_code', 'country', 'phone_number', 'shipping_method', 'tracking_number']
+
+
+class VendorProfileForm(forms.ModelForm):
+    class Meta:
+        model = Vendor
+        fields = ['name', 'description', 'logo', 'phone_number', 'location']

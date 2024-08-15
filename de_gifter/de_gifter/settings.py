@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'django_extensions',
     'django.contrib.admin',
     'widget_tweaks',
+    'django_countries',
+    'country_dialcode',
 ]
 
 MIDDLEWARE = [

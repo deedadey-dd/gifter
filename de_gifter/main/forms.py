@@ -1,6 +1,12 @@
 from django import forms
 from .models import Item, ItemImage, Wishlist, WishlistItem, User
+from store.models import Vendor
+from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
+from django_countries.fields import CountryField
+from django_countries.widgets import CountrySelectWidget
+from django_countries.widgets import CountrySelectWidget
+from country_dialcode.widgets import CountryDialcodeSelectWidget
 
 
 class ItemForm(forms.ModelForm):
@@ -15,16 +21,102 @@ class UserLoginForm(forms.Form):
     remember = forms.BooleanField(required=False)
 
 
+# class UserRegistrationForm(UserCreationForm):
+#     email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control'}))
+#     name = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class': 'form-control'}))
+#     country_code = CountryField().formfield(
+#         widget=CountrySelectWidget(attrs={'class': 'form-control'})
+#     )
+#     phone_number = forms.CharField(
+#         max_length=20,
+#         widget=forms.TextInput(attrs={
+#             'class': 'form-control',
+#             'placeholder': 'Enter your phone number',
+#             'type': 'tel'
+#         })
+#     )
+#
+#     profile_picture = forms.ImageField(required=False, widget=forms.FileInput(attrs={'class': 'form-control'}))
+#     user_type = forms.ChoiceField(
+#         choices=[('user', 'User'), ('vendor', 'Vendor')],
+#         label='Register As:',
+#         widget=forms.RadioSelect(attrs={'class': 'form-check-inline'})
+#     )
+#
+#     class Meta:
+#         model = User
+#         fields = ['user_type', 'username', 'name', 'email', 'country_code', 'phone_number', 'profile_picture', 'password1', 'password2']
+#         widgets = {
+#             'username': forms.TextInput(attrs={'class': 'form-control'}),
+#             'password1': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter password'}),
+#             'password2': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm password'}),
+#         }
+#
+#     def __init__(self, *args, **kwargs):
+#         user_type = kwargs.pop('user_type', 'user')
+#         super().__init__(*args, **kwargs)
+#
+#         if user_type == 'vendor':
+#             self.fields['profile_picture'].label = 'Logo'
+#             self.fields['profile_picture'].widget = forms.ClearableFileInput(attrs={'class': 'form-control'})
+#         else:
+#             self.fields['profile_picture'].label = 'Profile Picture'
+#
+#     def clean_phone_number(self):
+#         phone_number = self.cleaned_data.get('phone_number')
+#         country_code = self.cleaned_data.get('country_code')
+#         if phone_number and country_code:
+#             return f'{country_code} {phone_number}'
+#         return phone_number
+
+
 class UserRegistrationForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-    name = forms.CharField(max_length=150)
-    phone_number = forms.CharField(max_length=20)
-    profile_picture = forms.ImageField(required=False)
-    # cash_on_hand = forms.FloatField(required=False, initial=0.00)
+    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    name = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    country_code = CountryField().formfield(
+        widget=CountrySelectWidget(attrs={'class': 'form-control'})
+    )
+    phone_number = forms.CharField(
+        max_length=20,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your phone number',
+            'type': 'tel'
+        })
+    )
+
+    profile_picture = forms.ImageField(required=False, widget=forms.FileInput(attrs={'class': 'form-control'}))
+    user_type = forms.ChoiceField(
+        choices=[('user', 'User'), ('vendor', 'Vendor')],
+        label='Register As:',
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'})
+    )
 
     class Meta:
         model = User
-        fields = ['username', 'name', 'email', 'phone_number', 'profile_picture', 'password1', 'password2']
+        fields = ['user_type', 'username', 'name', 'email', 'country_code', 'phone_number', 'profile_picture', 'password1', 'password2']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'password1': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter password'}),
+            'password2': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm password'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        user_type = kwargs.pop('user_type', 'user')
+        super().__init__(*args, **kwargs)
+
+        if user_type == 'vendor':
+            self.fields['profile_picture'].label = 'Logo'
+            self.fields['profile_picture'].widget = forms.ClearableFileInput(attrs={'class': 'form-control'})
+        else:
+            self.fields['profile_picture'].label = 'Profile Picture'
+
+    def clean_phone_number(self):
+        phone_number = self.cleaned_data.get('phone_number')
+        country_code = self.cleaned_data.get('country_code')
+        if phone_number and country_code:
+            return f'{country_code} {phone_number}'
+        return phone_number
 
 
 class PhoneConfirmationForm(forms.Form):

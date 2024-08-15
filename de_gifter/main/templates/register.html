@@ -1,41 +1,76 @@
-{% extends "base.html" %}
-
-{% block title %}Register{% endblock %}
+<!-- register.html -->
+{% extends 'base.html' %}
 
 {% block content %}
-<div class="container">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-<!--                <div class="card">-->
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2>Register</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group row">
 
-                        <h2 class="mt-5 text-center">Register</h2>
-    <!--                    <form method="POST" enctype="multipart/form-data">-->
-    <!--                        {% csrf_token %}-->
-    <!--                        {{ form.as_p }}-->
-    <!--                        <button type="submit" class="btn btn-primary">Register</button>-->
-    <!--                    </form>-->
-                            {% load widget_tweaks %}
-                            <form id="registerForm" method="post">
-                              {% csrf_token %}
-                              {{ form.non_field_errors }}
+                <div class="col-md-6">
+                    <label for="{{ form.username.id_for_label }}">Username</label>
+                    {{ form.username }}
+                </div>
 
-                              {% for field in form %}
-                                <div class="form-group">
-                                  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                                    {{ field.errors }}
-                                    {{ field|add_class:"form-control" }}
-                                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                <div class="col-md-3">
+                    <label for="{{ form.user_type.id }}">Register As:</label>
+                </div>
 
-                                </div>
-                              {% endfor %}
+                <div class="col-md-3">
+                    {{ form.user_type }}
+                </div>
 
-                              <button type="submit" class="btn btn-primary btn-block">Register</button>
-                            </form>
 
-<!--                </div>-->
             </div>
-        </div>
+
+
+            <div class="form-group">
+                <label for="{{ form.name.id_for_label }}">Name</label>
+                {{ form.name }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">Email</label>
+                {{ form.email }}
+            </div>
+            <div class="form-group row">
+                <label for="{{ form.country_code.id_for_label }}" class="col-md-3 col-form-label">Country Code</label>
+                <label for="{{ form.phone_number.id_for_label }}" class="col-md-9 col-form-label">Phone Number</label>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-3">
+                    {{ form.country_code }}
+                </div>
+                <div class="col-md-9">
+                    {{ form.phone_number }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="{{ form.profile_picture.id_for_label }}">Profile Picture</label>
+                {{ form.profile_picture }}
+            </div>
+
+                <div class="form-group row">
+                    <label for="{{ form.password1.id_for_label }}" class="col-md-6">Password</label>
+                    <label for="{{ form.password2.id_for_label }}" class="col-md-6">Confirm Password</label>
+
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        {{ form.password1 }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.password2 }}
+                    </div>
+
+                </div>
+
+
+            <button type="submit" class="btn btn-primary form-control">Register</button>
+        </form>
     </div>
 </div>
+
 {% endblock %}

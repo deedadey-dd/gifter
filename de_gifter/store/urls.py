@@ -11,5 +11,9 @@ urlpatterns = [
     path('buy_item/<int:product_id>/', views.buy_item, name='buy_item'),
     path('order-confirmation/<int:order_id>/', views.order_confirmation, name='order_confirmation'),
     path('add-product/', views.add_product, name='add_product'),
+    path('my-products/', views.my_products, name='my_products'),
+    path('my-orders/', views.my_orders, name='my_orders'),
+    path('vendor-profile/', views.vendor_profile, name='vendor_profile'),
+    path('edit-vendor-profile/', views.edit_vendor_profile, name='edit_vendor_profile'),
 
 ]

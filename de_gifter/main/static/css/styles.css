@@ -92,3 +92,13 @@ body.theme-light .title-highlight {
     border-radius: 50px;
     color: #fff;
 }
+
+.form-group.row {
+    display: flex;
+    align-items: center;
+}
+
+.form-group.row .col-md-4,
+.form-group.row .col-md-8 {
+    margin-right: 10px; /* Adjust spacing as needed */
+}

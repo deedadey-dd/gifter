@@ -51,19 +51,32 @@ def home(request):
 
 def register(request):
     if request.method == 'POST':
-        form = UserRegistrationForm(request.POST, request.FILES)
+        user_type = request.POST.get('user_type', 'user')
+        form = UserRegistrationForm(request.POST, request.FILES, user_type=user_type)
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_active = False  # Deactivate account until email is confirmed
-            user.generate_confirmation_pin()
-            user.save()
-            send_confirmation_email(request, user)
-            messages.success(request, 'Please confirm your email and phone number to complete registration.')
-            # send user pin to the user's phone number using mnotify account 0265550354
-            send_confirmation_pin(user)
-
-            return redirect('confirm_phone', uidb64=urlsafe_base64_encode(force_bytes(user.pk)))
-
+            if user_type == 'vendor':
+                # Create vendor profile
+                vendor = Vendor.objects.create(
+                    user=user,
+                    name=form.cleaned_data['name'],
+                    email=form.cleaned_data['email'],
+                    phone_number=form.cleaned_data['phone_number'],
+                    logo=form.cleaned_data['profile_picture'],
+                    # Initialize other fields as necessary
+                )
+                # user.save()
+                vendor.save()
+            else:
+                user.is_active = False
+                user.generate_confirmation_pin()
+                user.save()
+                send_confirmation_email(request, user)
+                messages.success(request, 'Please confirm your email and phone number to complete registration.')
+                send_confirmation_pin(user)
+                return redirect('confirm_phone', uidb64=urlsafe_base64_encode(force_bytes(user.pk)))
+            # Redirect to a different page for vendors if needed
+            # return redirect('confirm_phone', uidb64=urlsafe_base64_encode(force_bytes(user.pk)))
     else:
         form = UserRegistrationForm()
     return render(request, 'register.html', {'form': form})
@@ -181,7 +194,9 @@ def user_login(request):
             password = form.cleaned_data.get('password')
 
             # Authenticate User
-            user = authenticate(request, username=identifier, password=password) or authenticate(request, email=identifier, password=password)
+            user = authenticate(request, username=identifier, password=password) or authenticate(request,
+                                                                                                 email=identifier,
+                                                                                                 password=password)
 
             # Authenticate Vendor
             vendor = Vendor.objects.filter(email=identifier).first()
@@ -190,11 +205,18 @@ def user_login(request):
 
             if user is not None:
                 login(request, user)
-                return redirect('home')
+
+                # Redirect based on user type
+                if hasattr(user, 'vendor'):  # Check if the user has a related Vendor object
+                    return redirect('my_orders')  # Redirect vendors to my_orders
+                else:
+                    return redirect('home')  # Redirect non-vendor users to home
+
             else:
                 messages.error(request, 'Invalid username/email or password')
     else:
         form = UserLoginForm()
+
     return render(request, 'login.html', {'form': form})
 
 
