@@ -11,7 +11,7 @@ from django.conf import settings
 class User(AbstractUser):
     name = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
-    phone_number = models.CharField(max_length=20)
+    phone_number = models.CharField(max_length=20, unique=True)
     profile_picture = models.ImageField(upload_to='uploads/profiles/', null=True, blank=True)
     cash_on_hand = models.FloatField(default=0.00)
     email_confirmed = models.BooleanField(default=False)

@@ -49,37 +49,27 @@ def home(request):
     return render(request, 'index.html', context)
 
 
-def register(request):
+def register_landing(request):
+    return render(request, 'register_landing.html')
+
+
+def user_register(request):
     if request.method == 'POST':
-        user_type = request.POST.get('user_type', 'user')
-        form = UserRegistrationForm(request.POST, request.FILES, user_type=user_type)
+        form = UserRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save(commit=False)
-            if user_type == 'vendor':
-                # Create vendor profile
-                vendor = Vendor.objects.create(
-                    user=user,
-                    name=form.cleaned_data['name'],
-                    email=form.cleaned_data['email'],
-                    phone_number=form.cleaned_data['phone_number'],
-                    logo=form.cleaned_data['profile_picture'],
-                    # Initialize other fields as necessary
-                )
-                # user.save()
-                vendor.save()
-            else:
-                user.is_active = False
-                user.generate_confirmation_pin()
-                user.save()
-                send_confirmation_email(request, user)
-                messages.success(request, 'Please confirm your email and phone number to complete registration.')
-                send_confirmation_pin(user)
-                return redirect('confirm_phone', uidb64=urlsafe_base64_encode(force_bytes(user.pk)))
-            # Redirect to a different page for vendors if needed
-            # return redirect('confirm_phone', uidb64=urlsafe_base64_encode(force_bytes(user.pk)))
+            user.is_active = False
+            user.generate_confirmation_pin()
+            user.save()
+            send_confirmation_email(request, user)
+            messages.success(request, 'Please confirm your email and phone number to complete registration.')
+            send_confirmation_pin(user)
+            return redirect('confirm_phone', uidb64=urlsafe_base64_encode(force_bytes(user.pk)))
+        # Redirect to a different page for vendors if needed
+        # return redirect('confirm_phone', uidb64=urlsafe_base64_encode(force_bytes(user.pk)))
     else:
         form = UserRegistrationForm()
-    return render(request, 'register.html', {'form': form})
+    return render(request, 'register_user.html', {'form': form})
 
 
 def send_confirmation_pin(user):

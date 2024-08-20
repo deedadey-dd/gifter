@@ -30,7 +30,8 @@ class Vendor(models.Model):
         ('rejected', 'Rejected'),
     ]
 
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=0)
+    # user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=0)
+    username = models.CharField(max_length=150, unique=True)
     name = models.CharField(max_length=150)
     description = models.TextField()
     logo = models.ImageField(upload_to='uploads/vendors/', null=True, blank=True)

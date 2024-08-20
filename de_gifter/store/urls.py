@@ -15,5 +15,5 @@ urlpatterns = [
     path('my-orders/', views.my_orders, name='my_orders'),
     path('vendor-profile/', views.vendor_profile, name='vendor_profile'),
     path('edit-vendor-profile/', views.edit_vendor_profile, name='edit_vendor_profile'),
-
+    path('register/vendor/', views.vendor_register, name='vendor_register'),
 ]

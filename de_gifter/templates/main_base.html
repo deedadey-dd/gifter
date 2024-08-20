@@ -55,7 +55,7 @@
                     </li>
                 {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'register' %}">Register</a>
+                        <a href="#" class="nav-link" data-toggle="modal" data-target="#registerModal">Register</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'login' %}">Login</a>
@@ -64,6 +64,52 @@
             </ul>
         </div>
     </nav>
+
+    <!-- Registration Modal -->
+    <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">Register</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+<!--                    <p>Select how you want to register:</p>-->
+<!--                    <a href="{% url 'user_register' %}" class="btn btn-primary btn-block">Register as User</a>-->
+<!--                    <a href="{% url 'vendor_register' %}" class="btn btn-secondary btn-block">Register as Vendor</a>-->
+                    <div class="container mt-5">
+                        <h2 class="text-center mb-4">Register</h2>
+                        <div class="row justify-content-center">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h3 class="card-title">Register as User</h3>
+                                        <p class="card-text">Create an account as a user to browse and purchase products.</p>
+                                        <a href="{% url 'user_register' %}" class="btn btn-primary">User <br> Registration</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h3 class="card-title">Register as Vendor</h3>
+                                        <p class="card-text">Sign up as a vendor to sell your products on our platform.</p>
+                                        <a href="{% url 'vendor_register' %}" class="btn btn-primary">Vendor <br> Registration</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         {% if messages %}
             <div class="mt-3">

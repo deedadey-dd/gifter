@@ -1,3 +1,4 @@
+/* Light and Dark Theme Base */
 body.theme-light {
     background-color: #ffffff;
     color: #232424;
@@ -8,6 +9,7 @@ body.theme-dark {
     color: #ffffff;
 }
 
+/* Navbar */
 body.theme-light .navbar {
     background-color: #f8f9fa;
     color: #232424;
@@ -30,7 +32,7 @@ body.theme-dark .navbar .dropdown-toggle {
     color: #ffffff;
 }
 
-/* Added CSS for dropdown menus */
+/* Dropdown Menus */
 body.theme-light .dropdown-menu {
     background-color: #ffffff;
     color: #232424;
@@ -61,7 +63,7 @@ body.theme-light .dropdown-item:focus {
     color: #232424;
 }
 
-/* Added CSS for cards */
+/* Cards */
 body.theme-light .card {
     background-color: #ffffff;
     color: #000000;
@@ -85,14 +87,7 @@ body.theme-light .title-highlight {
     color: #343a40;
 }
 
-.expired-label {
-    display: inline-block;
-    background-color: #f54c40;
-    padding: 5px 10px;
-    border-radius: 50px;
-    color: #fff;
-}
-
+/* Form Group */
 .form-group.row {
     display: flex;
     align-items: center;
@@ -101,4 +96,66 @@ body.theme-light .title-highlight {
 .form-group.row .col-md-4,
 .form-group.row .col-md-8 {
     margin-right: 10px; /* Adjust spacing as needed */
+}
+
+/* Modal Styling for Light and Dark Themes */
+
+/* Modal Background */
+body.theme-light .modal-content {
+    background-color: #ffffff;
+    color: #232424;
+}
+
+body.theme-dark .modal-content {
+    background-color: #343a40;
+    color: #ffffff;
+}
+
+/* Modal Header */
+body.theme-light .modal-header {
+    border-bottom: 1px solid #dee2e6;
+}
+
+body.theme-dark .modal-header {
+    border-bottom: 1px solid #495057;
+}
+
+/* Modal Footer */
+body.theme-light .modal-footer {
+    border-top: 1px solid #dee2e6;
+}
+
+body.theme-dark .modal-footer {
+    border-top: 1px solid #495057;
+}
+
+/* Modal Buttons */
+body.theme-light .btn {
+    background-color: #f8f9fa;
+    color: #232424;
+}
+
+body.theme-dark .btn {
+    background-color: #495057;
+    color: #ffffff;
+}
+
+body.theme-light .btn-secondary {
+    background-color: #e9ecef;
+    color: #232424;
+}
+
+body.theme-dark .btn-secondary {
+    background-color: #6c757d;
+    color: #ffffff;
+}
+
+body.theme-light .btn-primary {
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+body.theme-dark .btn-primary {
+    background-color: #007bff;
+    color: #ffffff;
 }

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2>Register as Vendor</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Username -->
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}">Username</label>
+                {{ form.username }}
+            </div>
+
+            <!-- Vendor Name -->
+            <div class="form-group">
+                <label for="{{ form.name.id_for_label }}">Vendor Name</label>
+                {{ form.name }}
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+                <label for="{{ form.description.id_for_label }}">Description</label>
+                {{ form.description }}
+            </div>
+
+            <!-- Logo -->
+            <div class="form-group">
+                <label for="{{ form.logo.id_for_label }}">Logo</label>
+                {{ form.logo }}
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">Email</label>
+                {{ form.email }}
+            </div>
+
+            <!-- Phone Number -->
+            <div class="form-group row">
+                <label for="{{ form.country_code.id_for_label }}" class="col-md-3 col-form-label">Country Code</label>
+                <label for="{{ form.phone_number.id_for_label }}" class="col-md-9 col-form-label">Phone Number</label>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-3">
+                    {{ form.country_code }}
+                </div>
+                <div class="col-md-9">
+                    {{ form.phone_number }}
+                </div>
+            </div>
+
+            <!-- Location -->
+            <div class="form-group">
+                <label for="{{ form.location.id_for_label }}">Location</label>
+                {{ form.location }}
+            </div>
+
+            <!-- Password -->
+            <div class="form-group row">
+                <label for="{{ form.password1.id_for_label }}" class="col-md-6">Password</label>
+                <label for="{{ form.password2.id_for_label }}" class="col-md-6">Confirm Password</label>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-6">
+                    {{ form.password1 }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.password2 }}
+                </div>
+            </div>
+
+            <!-- Register Button -->
+            <button type="submit" class="btn btn-primary form-control">Register as Vendor</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

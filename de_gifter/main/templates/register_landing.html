@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Register</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3 class="card-title">Register as User</h3>
+                    <p class="card-text">Create an account as a user to browse and purchase products.</p>
+                    <a href="{% url 'user_register' %}" class="btn btn-primary">User Registration</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3 class="card-title">Register as Vendor</h3>
+                    <p class="card-text">Sign up as a vendor to sell your products on our platform.</p>
+                    <a href="{% url 'vendor_register' %}" class="btn btn-primary">Vendor Registration</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

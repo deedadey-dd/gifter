@@ -6,11 +6,11 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('register/', views.register, name='register'),
+    path('register/', views.register_landing, name='register_landing'),
+    path('register/user/', views.user_register, name='user_register'),
     path('login/', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
     path('gift_item/<int:wishlist_id>/<int:item_id>/', views.gift_item, name='gift_item'),
-    path('register/', views.register, name='register'),
     path('activate/<uidb64>/<token>/', views.activate, name='activate'),
     path('confirm_phone/<uidb64>/', views.confirm_phone, name='confirm_phone'),
     path('resend_pin/', views.resend_pin, name='resend_pin'),
