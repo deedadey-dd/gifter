@@ -3,10 +3,7 @@ from .models import Product, Category, Order, OrderItem, Vendor
 from .forms import ProductForm, OrderForm, ShippingDetailsForm, VendorProfileForm, VendorRegistrationForm
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import VendorRegistrationForm
-from .models import Vendor
 from main.tokens import account_activation_token
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -15,6 +12,7 @@ from django.utils.encoding import force_bytes, force_str
 import requests
 import os
 from main.forms import PhoneConfirmationForm
+from django.urls import reverse
 
 sms_endpoint = os.environ['SMS_ENDPOINT']
 sms_apikey = os.environ['SMS_API']
@@ -28,10 +26,10 @@ def vendor_register(request):
             vendor.is_active = False
             vendor.generate_confirmation_pin()  # Assuming you have this method for vendors
             vendor.save()
-            send_confirmation_email(request, vendor)
+            send_confirmation_email_v(request, vendor)
             send_confirmation_pin(vendor)  # Assuming you have this method for vendors
             messages.success(request, 'Please confirm your email and phone number to complete registration.')
-            return redirect('confirm_phone', uidb64=urlsafe_base64_encode(force_bytes(vendor.pk)))
+            return redirect('confirm_vendor_phone', uidb64=urlsafe_base64_encode(force_bytes(vendor.pk)))
     else:
         form = VendorRegistrationForm()
 
@@ -39,6 +37,7 @@ def vendor_register(request):
 
 
 def send_confirmation_pin(vendor):
+    # Activate this section in production to send SMS
     data = {
         'recipient[]': [f'{vendor.phone_number}'],
         'sender': 'Dee Code',
@@ -46,16 +45,26 @@ def send_confirmation_pin(vendor):
     }
     url = sms_endpoint + '?key=' + sms_apikey
     requests.post(url, data)
+
+    # Disable this line in production to stop printing the code in the terminal
     print(f'sent {vendor.phone_confirmation_pin} to {vendor.phone_number}')
 
 
-def send_confirmation_email(request, vendor):
-    mail_subject = 'Activate your account.'
-    message = render_to_string('acc_active_email.html', {
+def send_confirmation_email_v(request, vendor):
+    mail_subject = 'Activate Your Vendor Account.'
+
+    # Generate the activation link
+    uid = urlsafe_base64_encode(force_bytes(vendor.pk))
+    token = account_activation_token.make_token(vendor)
+    activation_link = reverse('activate_vendor', kwargs={'uidb64': uid,
+                                                         'token': token})
+    full_activation_url = f"http://{request.META.get('HTTP_HOST', 'localhost')}{activation_link}"
+    print(full_activation_url)
+
+    # Render the email template with context
+    message = render_to_string('store/acc_v_active_email.html', {
         'vendor': vendor,
-        'domain': request.META.get('HTTP_HOST', 'localhost'),
-        'uid': urlsafe_base64_encode(force_bytes(vendor.pk)),
-        'token': account_activation_token.make_token(vendor),
+        'activation_link': full_activation_url,
     })
 
     try:
@@ -71,7 +80,7 @@ def send_confirmation_email(request, vendor):
         print(f'Error sending confirmation email: {e}')
 
 
-def activate(request, uidb64, token):
+def activate_vendor(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
         vendor = Vendor.objects.get(pk=uid)
@@ -86,10 +95,10 @@ def activate(request, uidb64, token):
         return redirect('login')
     else:
         messages.error(request, 'Activation link is invalid!')
-        return redirect('register')
+        return redirect('register_vendor')
 
 
-def confirm_phone(request, uidb64):
+def confirm_vendor_phone(request, uidb64):
     vendor = get_object_or_404(Vendor, pk=force_str(urlsafe_base64_decode(uidb64)))
     if request.method == 'POST':
         form = PhoneConfirmationForm(request.POST)
@@ -105,7 +114,7 @@ def confirm_phone(request, uidb64):
                 messages.error(request, 'Invalid PIN. Please try again.')
     else:
         form = PhoneConfirmationForm()
-    return render(request, 'confirm_phone.html', {'form': form, 'uid': uidb64})
+    return render(request, 'store/confirm_vendor_phone.html', {'form': form, 'uid': uidb64})
 
 
 def resend_pin(request):
@@ -122,6 +131,7 @@ def resend_pin(request):
     return redirect('confirm_phone', uidb64=urlsafe_base64_encode(force_bytes(vendor.pk)))
 
 
+# @login_required()
 def add_product(request):
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)

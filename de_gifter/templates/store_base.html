@@ -28,8 +28,8 @@
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        {% if user.profile_picture %}
-                            <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}'s profile picture" class="rounded-circle" width="30" height="30">
+                        {% if vendor.profile_picture %}
+                            <img src="{{ vendor.profile_picture.url }}" alt="{{ vendor.username }}'s profile picture" class="rounded-circle" width="30" height="30">
                         {% else %}
                             <img src="{% static 'default-profile.svg' %}" alt="Profile Picture" class="rounded-circle" width="30" height="30">
                         {% endif %}

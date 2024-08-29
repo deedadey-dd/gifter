@@ -1,12 +1,13 @@
 # main/views.py
 import requests
+from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.views import PasswordResetView
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 from django.http import HttpResponseBadRequest
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login, authenticate, logout, get_backends
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy, reverse
 from .forms import (UserRegistrationForm, UserLoginForm, ItemForm, ItemImageForm, WishlistItemForm,
@@ -120,7 +121,7 @@ def activate(request, uidb64, token):
         return redirect('login')
     else:
         messages.error(request, 'Activation link is invalid!')
-        return redirect('register')
+        return redirect('register_user')
 
 
 def confirm_phone(request, uidb64):
@@ -176,6 +177,36 @@ def resend_pin(request):
 #     return render(request, 'login.html', {'form': form})
 
 
+# def user_login(request):
+#     if request.method == 'POST':
+#         form = UserLoginForm(request.POST)
+#         if form.is_valid():
+#             identifier = form.cleaned_data.get('identifier')
+#             password = form.cleaned_data.get('password')
+#
+#             # First try to authenticate as a regular User
+#             user = authenticate(request, username=identifier, password=password)
+#
+#             # If user authentication fails, try Vendor authentication
+#             if user is None:
+#                 user = authenticate(request, username=identifier, password=password, backend='path.to.VendorBackend')
+#
+#             if user is not None:
+#                 login(request, user, backend=user.backend if hasattr(user, 'backend') else None)
+#
+#                 # Redirect based on user type (Vendor or regular User)
+#                 if isinstance(user, Vendor):
+#                     return redirect('my_orders')  # Redirect vendors to 'my_orders'
+#                 else:
+#                     return redirect('home')  # Redirect regular users to 'home'
+#             else:
+#                 messages.error(request, 'Invalid username/email or password')
+#     else:
+#         form = UserLoginForm()
+#
+#     return render(request, 'login.html', {'form': form})
+
+
 def user_login(request):
     if request.method == 'POST':
         form = UserLoginForm(request.POST)
@@ -183,27 +214,36 @@ def user_login(request):
             identifier = form.cleaned_data.get('identifier')
             password = form.cleaned_data.get('password')
 
-            # Authenticate User
-            user = authenticate(request, username=identifier, password=password) or authenticate(request,
-                                                                                                 email=identifier,
-                                                                                                 password=password)
+            # Try to authenticate User
+            user = authenticate(request, username=identifier, password=password)
+            print("User Authentication:", user)
 
-            # Authenticate Vendor
-            vendor = Vendor.objects.filter(email=identifier).first()
-            if vendor and vendor.check_password(password):
-                user = vendor  # Treat vendor as user if authenticated
+            # If user authentication fails, try Vendor authentication
+            if user is None:
+                vendor = Vendor.objects.filter(email=identifier).first()
+                if vendor:
+                    print("Vendor Found:", vendor.username)
+                    if vendor.check_password(password):
+                        user = vendor  # Treat vendor as user
+                        print("Vendor Authentication Successful")
+                    else:
+                        print("Vendor Authentication Failed")
+                else:
+                    print("Vendor Not Found")
 
             if user is not None:
                 login(request, user)
+                print("Login Successful")
 
-                # Redirect based on user type
-                if hasattr(user, 'vendor'):  # Check if the user has a related Vendor object
-                    return redirect('my_orders')  # Redirect vendors to my_orders
+                # Redirect based on user type (Vendor or regular User)
+                if isinstance(user, Vendor):  # Check if user is a Vendor instance
+                    return redirect('add_product')  # Redirect vendors to 'my_orders'
                 else:
-                    return redirect('home')  # Redirect non-vendor users to home
-
+                    return redirect('home')  # Redirect regular users to 'home'
             else:
                 messages.error(request, 'Invalid username/email or password')
+        else:
+            print("Form is not valid:", form.errors)
     else:
         form = UserLoginForm()
 

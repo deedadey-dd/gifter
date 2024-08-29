@@ -113,7 +113,7 @@ AUTH_USER_MODEL = 'main.User'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # Default backend for users
-    'store.backends.VendorBackend',  # Custom backend for vendors
+    'store.auth_backends.VendorBackend',  # Custom backend for Vendors
 ]
 
 
@@ -121,6 +121,10 @@ AUTHENTICATION_BACKENDS = [
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
+
+LOGIN_URL = '/login/'
+
+LOGIN_REDIRECT_URL = '/'
 
 SITE_ID = 1
 
@@ -132,6 +136,9 @@ USE_L10N = True
 
 USE_TZ = True
 
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_NAME = 'sessionid'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/

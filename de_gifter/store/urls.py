@@ -16,4 +16,6 @@ urlpatterns = [
     path('vendor-profile/', views.vendor_profile, name='vendor_profile'),
     path('edit-vendor-profile/', views.edit_vendor_profile, name='edit_vendor_profile'),
     path('register/vendor/', views.vendor_register, name='vendor_register'),
+    path('confirm_vendor_phone/<uidb64>/', views.confirm_vendor_phone, name='confirm_vendor_phone'),
+    path('activate_vendor/<uidb64>/<token>/', views.activate_vendor, name='activate_vendor'),
 ]

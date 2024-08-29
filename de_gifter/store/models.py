@@ -1,5 +1,5 @@
 import random
-
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.contrib.auth.hashers import make_password, check_password
 from django.db import models
 from django.conf import settings
@@ -17,7 +17,24 @@ class Category(models.Model):
         return self.name
 
 
-class Vendor(models.Model):
+class VendorManager(BaseUserManager):
+    def create_user(self, email, username, password=None, **extra_fields):
+        if not email:
+            raise ValueError('The Email field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, username=username, **extra_fields)
+        user.set_password(password)  # Uses AbstractBaseUser's set_password method
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, username, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        return self.create_user(email, username, password, **extra_fields)
+
+
+class Vendor(AbstractBaseUser, PermissionsMixin):
     STATUS_CHOICES = [
         ('active', 'Active'),
         ('inactive', 'Inactive'),
@@ -30,7 +47,6 @@ class Vendor(models.Model):
         ('rejected', 'Rejected'),
     ]
 
-    # user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=0)
     username = models.CharField(max_length=150, unique=True)
     name = models.CharField(max_length=150)
     description = models.TextField()
@@ -44,15 +60,15 @@ class Vendor(models.Model):
     email_confirmed = models.BooleanField(default=False)
     phone_confirmed = models.BooleanField(default=False)
     phone_confirmation_pin = models.CharField(max_length=6, blank=True, null=True)
-    password = models.CharField(max_length=255, default='1234gifted1234')  # Store hashed password
     fee_percentage = models.FloatField(default=5.0)  # Fee percentage for each transaction
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    last_login = models.DateTimeField(null=True, blank=True)
 
-    def set_password(self, raw_password):
-        self.password = make_password(raw_password)
-        self.save()
+    objects = VendorManager()
 
-    def check_password(self, raw_password):
-        return check_password(raw_password, self.password)
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
     def generate_confirmation_pin(self):
         self.phone_confirmation_pin = ''.join(random.choices(string.digits, k=6))
@@ -85,7 +101,7 @@ class Product(models.Model):
     description = models.TextField()
     price = models.FloatField()
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='products')
-    category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='products')
+    category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='products', default='uncategorized', null=True)
     image = models.ImageField(upload_to='uploads/products/', null=True, blank=True)
     popularity_count = models.IntegerField(default=0)
     condition = models.CharField(max_length=20, choices=CONDITION_CHOICES, default='New')
